@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityDocsBot", "UnityDocsBot\UnityDocsBot.csproj", "{FE129E3F-F59E-47C6-A239-523BAD7362F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityDocsBotConsole", "UnityDocsBotConsole\UnityDocsBotConsole.csproj", "{FE313C16-0D8B-4937-A8A6-DF1F7998F9EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE129E3F-F59E-47C6-A239-523BAD7362F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE129E3F-F59E-47C6-A239-523BAD7362F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE129E3F-F59E-47C6-A239-523BAD7362F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE129E3F-F59E-47C6-A239-523BAD7362F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE313C16-0D8B-4937-A8A6-DF1F7998F9EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE313C16-0D8B-4937-A8A6-DF1F7998F9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE313C16-0D8B-4937-A8A6-DF1F7998F9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE313C16-0D8B-4937-A8A6-DF1F7998F9EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D56E57C0-E457-4924-8FF6-C1958E7BF85F}
+	EndGlobalSection
+EndGlobal
