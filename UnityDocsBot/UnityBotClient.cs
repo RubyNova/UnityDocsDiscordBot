@@ -42,8 +42,6 @@ namespace UnityDocsBot
                 .Build();
             await _client.LoginAsync(TokenType.Bot, _config["BotToken"]); //TODO: commit seppuku
             await _client.StartAsync();
-
-            await Task.Delay(-1);
         }
 
         private IServiceProvider ConfigureServices()
