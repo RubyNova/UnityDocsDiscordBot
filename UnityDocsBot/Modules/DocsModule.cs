@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using UnityDocsBot.Services;
 
 namespace UnityDocsBot.Modules
 {
     public class DocsModule : ModuleBase<DocsCommandContext>
     {
+        readonly DocLookupService _docLookup;
+
+        public DocsModule(DocLookupService docLookup)
+        {
+            _docLookup = docLookup;
+        }
+
         [Command("help"), Summary("Lists all bot commands.")]
         public async Task Help()
         {
@@ -19,7 +28,7 @@ namespace UnityDocsBot.Modules
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(command.Name + " ");
-                foreach (ParameterInfo commandParameter in command.Parameters)
+                foreach (var commandParameter in command.Parameters)
                 {
                     if (commandParameter.IsOptional)
                     {
@@ -41,7 +50,7 @@ namespace UnityDocsBot.Modules
         public async Task Info()
         {
             SocketUser user = Context.Client.GetUser(223834565544902656);
-            await ReplyAsync($"UNITY DOCS BOT V. 1.0, written by {user.Username}#{user.Discriminator}. If I break, please let him know!");
+            await ReplyAsync($"UNITY DOCS BOT V. {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}, written by {user?.Username ?? "RubyNova"}#{user?.Discriminator ?? "0404"}. If I break, please let him know!");
         }
 
         [Command("docs", RunMode = RunMode.Async), Summary("Searches the Manual for the desired name.")]
@@ -89,6 +98,14 @@ namespace UnityDocsBot.Modules
                 EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = "(Probably meant) " + key })
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField("Description:", docs[key][0]).AddField("Full Reference:", docs[key][1])
+                    .WithColor(Color.Green);
+                await ReplyAsync("", embed: builder.Build());
+            }
+            else if (_docLookup.TryGet(name.ToUpper(), out string[] lookup))
+            {
+                EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = name })
+                    .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
+                    .AddField("Description:", lookup[0]).AddField("Full Reference:", lookup[1])
                     .WithColor(Color.Green);
                 await ReplyAsync("", embed: builder.Build());
             }
