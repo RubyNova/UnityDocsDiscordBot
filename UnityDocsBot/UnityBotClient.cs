@@ -56,6 +56,7 @@ namespace UnityDocsBot
                 .AddSingleton(_versions)
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
+                .AddSingleton<DocLookupService>()
                 // Logging
                 .AddSingleton<LoggingService>()
                 // Add additional services here...
