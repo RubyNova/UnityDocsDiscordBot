@@ -40,7 +40,7 @@ namespace UnityDocsBot
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
             _config = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory).AddJsonFile("config.json")
                 .Build();
-            await _client.LoginAsync(TokenType.Bot, _config["BotToken"]); //TODO: commit seppuku
+            await _client.LoginAsync(TokenType.Bot, _config["BotToken"]);
             await _client.StartAsync();
         }
 

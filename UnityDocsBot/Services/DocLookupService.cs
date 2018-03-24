@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,13 @@ namespace UnityDocsBot.Services
             }
 
             return false;
+        }
+
+        public List<string> GetAllTags()
+        {
+            var json = JObject.Parse(File.ReadAllText(lookupFile));
+            var dict = json.ToObject<Dictionary<string, string>>();
+            return dict.Where(x => !string.IsNullOrWhiteSpace(x.Value)).Select(x => x.Key).ToList();
         }
     }
 }
