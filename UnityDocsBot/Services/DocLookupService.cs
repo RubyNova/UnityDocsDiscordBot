@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
@@ -39,8 +40,7 @@ namespace UnityDocsBot.Services
         public List<string> GetAllTags()
         {
             var json = JObject.Parse(File.ReadAllText(lookupFile));
-            var dict = json.ToObject<Dictionary<string, string>>();
-            return dict.Where(x => !string.IsNullOrWhiteSpace(x.Value)).Select(x => x.Key).ToList();
+            return json.ToObject<Dictionary<string, string[]>>().Where(x => x.Value.Length > 0).Select(x => x.Key).ToList();
         }
     }
 }
