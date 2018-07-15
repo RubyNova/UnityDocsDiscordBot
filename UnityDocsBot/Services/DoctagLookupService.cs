@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace UnityDocsBot.Services
 {
-    public class DocLookupService
+    public class DoctagLookupService
     {
         readonly string lookupFile = "lookup.json";
 
-        public DocLookupService()
+        public DoctagLookupService()
         {
             if (!File.Exists(lookupFile))
                 File.WriteAllText(lookupFile, "{ }");

@@ -7,23 +7,22 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using UnityDocsBot.Models;
 using UnityDocsBot.Services;
 
 namespace UnityDocsBot.Modules
 {
     public class DocsModule : ModuleBase<SocketCommandContext>
     {
-        private readonly DocLookupService _docLookup;
-        private readonly Dictionary<string, Dictionary<string, string[]>> _docs;
-        private readonly string _currentVersion;
+        private readonly DoctagLookupService _doctagLookup;
         private readonly List<CommandInfo> _commands;
+        private readonly DocsMasterUnityRetrievalService _docsService;
 
-        public DocsModule(DocLookupService docLookup, Dictionary<string, Dictionary<string, string[]>> docs, string currentVersion, CommandService service)
+        public DocsModule(DoctagLookupService doctagLookup, CommandService service, DocsMasterUnityRetrievalService docsService)
         {
-            _docLookup = docLookup;
-            _docs = docs;
-            _currentVersion = currentVersion;
+            _doctagLookup = doctagLookup;
             _commands = service.Commands.ToList();
+            _docsService = docsService;
         }
 
         [Command("help"), Summary("Lists all bot commands.")]
@@ -36,18 +35,14 @@ namespace UnityDocsBot.Modules
                 sb.Append(command.Name + " ");
                 foreach (var commandParameter in command.Parameters)
                 {
-                    if (commandParameter.IsOptional)
-                    {
-                        sb.Append($"<OPTIONAL: {commandParameter.Name}> ");
-                    }
-                    else
-                    {
-                        sb.Append($"<{commandParameter.Name}> ");
-                    }
-
+                    sb.Append(commandParameter.IsOptional
+                        ? $"<OPTIONAL: {commandParameter.Name}> "
+                        : $"<{commandParameter.Name}> ");
                 }
+
                 builder.AddField(sb.ToString(), command.Summary);
             }
+
             builder.WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl()).WithColor(Color.Green);
             await ReplyAsync("", embed: builder.Build());
         }
@@ -56,67 +51,33 @@ namespace UnityDocsBot.Modules
         public async Task Info()
         {
             SocketUser user = Context.Client.GetUser(223834565544902656);
-            await ReplyAsync($"UNITY DOCS BOT V. {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}, written by {user?.Username ?? "RubyNova"}#{user?.Discriminator ?? "0404"}. If I break, please let him know!");
+            await ReplyAsync(
+                $"UNITY DOCS BOT V. {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}, written by {user?.Username ?? "RubyNova"}#{user?.Discriminator ?? "0404"}. If I break, please let him know!");
         }
 
         [Command("docs", RunMode = RunMode.Async), Summary("Searches the Manual for the desired name.")]
         public async Task Docs(string name, string version = "")
         {
-            Dictionary<string, string[]> docs;
-            if (_docs.ContainsKey(version))
+            ManualEntryModel resultModel;
+            if (string.IsNullOrWhiteSpace(version))
             {
-                docs = _docs[version];
+                resultModel = await _docsService.GetManualEntryFromLatest(name);
             }
             else
             {
-                docs = _docs[_currentVersion];
+                resultModel = await _docsService.GetManualEntryFromVersion(name, version);
             }
-            if (docs.Keys.Any(x => x.ToUpper() == name.ToUpper()))
-            {
-                string key = docs.Keys.First(x => x.ToUpper() == name.ToUpper());
-                EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = key })
-                    .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
-                    .AddField("Description:", docs[key][0]).AddField("Full Reference:", docs[key][1])
-                    .WithColor(Color.Green);
-                await ReplyAsync("", embed: builder.Build());
-            }
-            else if (docs.Keys.Any(x => x.ToUpper().Contains($".{name.ToUpper()}")))
-            {
-                string key = docs.Keys.First(x => x.ToUpper().Contains($".{name.ToUpper()}"));
-                EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = "(Probably meant) " + key })
-                    .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
-                    .AddField("Description:", docs[key][0]).AddField("Full Reference:", docs[key][1])
-                    .WithColor(Color.Green);
-                await ReplyAsync("", embed: builder.Build());
-            }
-            else if (docs.Keys.Any(x => x.ToUpper().Contains($".{name.ToUpper()}.")))
-            {
-                string key = docs.Keys.First(x => x.ToUpper().Contains($".{name.ToUpper()}."));
-                EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = "(Probably meant) " + key })
-                    .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
-                    .AddField("Description:", docs[key][0]).AddField("Full Reference:", docs[key][1])
-                    .WithColor(Color.Green);
-                await ReplyAsync("", embed: builder.Build());
-            }
-            else if (docs.Keys.Any(x => x.ToUpper().Contains($"{name.ToUpper()}.")))
-            {
-                string key = docs.Keys.First(x => x.ToUpper().Contains($"{name.ToUpper()}."));
-                EmbedBuilder builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = "(Probably meant) " + key })
-                    .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
-                    .AddField("Description:", docs[key][0]).AddField("Full Reference:", docs[key][1])
-                    .WithColor(Color.Green);
-                await ReplyAsync("", embed: builder.Build());
-            }
-            else
-            {
-                await ReplyAsync("No documentation found.");
-            }
+            var builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = resultModel.EntryName })
+                .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
+                .AddField("Description:", resultModel.Description).AddField("Full Reference:", resultModel.FullReferenceLink)
+                .WithColor(Color.Green);
+            await ReplyAsync("", embed: builder.Build());
         }
 
         [Command("doctag"), Summary("Additional documentation-related tags that aren't in the script reference.")]
         public async Task DocTag(string tag)
         {
-            if (_docLookup.TryGet(tag.ToUpper(), out string[] lookup))
+            if (_doctagLookup.TryGet(tag.ToUpper(), out string[] lookup))
             {
                 await ReplyAsync($"<{lookup[0]}>");
             }
@@ -129,14 +90,14 @@ namespace UnityDocsBot.Modules
         [Command("doctags"), Summary("Lists all available tags that have associated data.")]
         public async Task DocTags()
         {
-            await ReplyAsync(_docLookup.GetAllTags().Aggregate((x, y) => $"{x}, {y}"));
+            await ReplyAsync(_doctagLookup.GetAllTags().Aggregate((x, y) => $"{x}, {y}"));
         }
 
         [Command("versions"), Summary("Displays the current manuals supported by this bot.")]
         public async Task Versions()
         {
             EmbedBuilder builder = new EmbedBuilder().WithAuthor("CURRENT SUPPORTED VERSIONS");
-            foreach (string version in _docs.Keys)
+            foreach (string version in await _docsService.GetAllVersionsAsync())
             {
                 builder.AddField(version,
                     "https://docs.unity3d.com/" + version +

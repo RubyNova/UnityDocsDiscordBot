@@ -15,7 +15,7 @@ namespace UnityDocsBotConsole
                 tcs.SetResult(true);
             };
 
-            var t = new UnityDocsBot.UnityBotClient("json-manuals").LaunchBotAsync();
+            var t = new UnityDocsBot.UnityBotClient().LaunchBotAsync();
 
             Task.WaitAll(t, tcs.Task);
         }

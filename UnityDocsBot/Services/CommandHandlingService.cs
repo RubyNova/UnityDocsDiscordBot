@@ -12,20 +12,17 @@ using UnityDocsBot.Modules;
 
 namespace UnityDocsBot.Services
 {
-    //This service is just copied code from Foxbot's example, if it ain't broke don't fix it ¯\_(ツ)_/¯
     public class CommandHandlingService
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private IServiceProvider _provider;
-        public static string CurrentUnityVersion { get; set; }
 
-        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient client, CommandService commands, string currentUnityVersion)
+        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient client, CommandService commands)
         {
             _client = client;
             _commands = commands;
             _provider = provider;
-            CurrentUnityVersion = currentUnityVersion;
             _client.MessageReceived += MessageReceived;
         }
 
