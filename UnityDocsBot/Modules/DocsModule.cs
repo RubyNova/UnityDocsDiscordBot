@@ -67,6 +67,13 @@ namespace UnityDocsBot.Modules
             {
                 resultModel = await _docsService.GetManualEntryFromVersion(name, version);
             }
+
+            if (resultModel == null)
+            {
+                await ReplyAsync("The manual or entry does not exist.");
+                return;
+            }
+            
             var builder = new EmbedBuilder().WithAuthor(new EmbedAuthorBuilder { Name = resultModel.EntryName })
                 .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                 .AddField("Description:", resultModel.Description).AddField("Full Reference:", resultModel.FullReferenceLink)
