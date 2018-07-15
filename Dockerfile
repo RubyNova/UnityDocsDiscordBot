@@ -1,14 +1,13 @@
-# NOTE: I cannot follow why the other directory is also being carried along for the ride, but I haven't touched it, so it should still work ¯\_(ツ)_/¯
+# NOTE: AH FIXED ET! - RubyNovarinos
 
 #Builder
 FROM microsoft/dotnet:2.1-sdk AS builder
 WORKDIR /app
-
+COPY /UnityDocsBot /UnityDocsBot
 COPY /UnityDocsBotConsole/*.csproj .
 RUN dotnet restore
 
 COPY /UnityDocsBotConsole .
-COPY /UnityDocsBot /UnityDocsBot
 RUN dotnet publish -c Release -o out
 
 # Build the runtime image
