@@ -29,7 +29,7 @@ namespace UnityDocsBot.Services
 
         public async Task<IEnumerable<string>> GetAllVersionsAsync()
         {
-            var result = await _client.GetAsync($"http://localhost:8080/ManualEntry/UnityDocs");
+            var result = await _client.GetAsync($"http://docsmaster.net/ManualEntry/UnityDocs");
             return JsonConvert.DeserializeObject<List<string>>(await result.Content.ReadAsStringAsync());
         }
     }
