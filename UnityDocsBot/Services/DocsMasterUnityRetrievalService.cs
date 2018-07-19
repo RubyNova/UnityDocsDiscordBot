@@ -17,13 +17,13 @@ namespace UnityDocsBot.Services
 
         public async Task<ManualEntryModel> GetManualEntryFromLatest(string entryName)
         {
-            var result = await _client.GetAsync($"http://localhost:8080/ManualEntry/UnityDocs/{entryName}");
+            var result = await _client.GetAsync($"http://docsmaster.net/ManualEntry/UnityDocs/{entryName}");
             return !result.IsSuccessStatusCode ? null : JsonConvert.DeserializeObject<ManualEntryModel>(await result.Content.ReadAsStringAsync());
         }
 
         public async Task<ManualEntryModel> GetManualEntryFromVersion(string entryName, string version)
         {
-            var result = await _client.GetAsync($"http://localhost:8080/ManualEntry/UnityDocs/{entryName}/{version}");
+            var result = await _client.GetAsync($"http://docsmaster.net/ManualEntry/UnityDocs/{entryName}/{version}");
             return !result.IsSuccessStatusCode ? null : JsonConvert.DeserializeObject<ManualEntryModel>(await result.Content.ReadAsStringAsync());
         }
 
